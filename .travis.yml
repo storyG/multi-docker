@@ -8,11 +8,19 @@ before_install:
   - docker build -t frank40609/react_test -f ./client/Dockerfile.dev ./client
 
 script:
-  # use -e CI=true to replace -- --coverage
-  - docker run -e CI=true frank40609/react-test npm test
+  # use -e CI=true to replace -- --coverage 
+  - docker run -e CI=true frank40609/react_test npm test
 
 after_success:
   - docker build -t frank40609/multi-client ./client
   - docker build -t frank40609/multi-nginx ./nginx
   - docker build -t frank40609/multi-server ./server
   - docker build -t frank40609/multi-worker ./worker
+  # login to the docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  
+  # Take those images and push the to docker hub
+  - docker push frank40609/multi-client
+  - docker push frank40609/multi-nginx 
+  - docker push frank40609/multi-server
+  - docker push frank40609/multi-worker
